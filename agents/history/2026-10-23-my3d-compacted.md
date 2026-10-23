@@ -76,3 +76,24 @@ all process health checks pass. No physical printing, clean-host, reboot or sign
 artifact claim. General sketch constraints/arcs and several formats remain
 unavailable as explicitly documented; this is a functional preview, not full
 master-brief completion. Published tags/assets remain immutable.
+
+## Loading feedback follow-up
+
+User reported selection actions floating over a blank workplane during CAD boot.
+Geometry has its own initially-busy lifecycle, separate from import/export status.
+Viewport shows a centred spinner/loading card until geometry arrives and a compact
+updating badge over existing geometry. Context actions require a rendered selected
+object and no active operation. Canvas resize exposes its visible height so the
+phone card stays above the Tools sheet. Cancellation invalidates even a pending
+debounced rebuild. Icons now forward className for spinner styling; reduced-motion
+preference keeps the textual status without rotation.
+
+Native isolated Edge loading acceptance passes delayed real worker loading at
+1672x941 and 390x844, selected-control gating, compact updating feedback, blank
+projects, cancel/restart, no page errors or horizontal overflow. Loading screenshots
+visually reviewed; npm unit tests pass. Preparing immutable preview2 and app-only
+managed update metadata. Owner has independently advanced to Workspace73; retain
+that manager and every other app. Its idle maintenance window currently reports
+an unauthenticated GitHub release-check403; do not overwrite that active runtime
+or use owner identity/Drive as a fixture. Resume with packaging/publication and a
+normal verified backup/update for My3D only, then deployed static-byte verification.

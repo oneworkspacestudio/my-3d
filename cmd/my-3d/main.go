@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var version = "0.1.0-preview.1"
+var version = "0.1.0-preview.2"
 
 func main() {
 	if e := apphost.Main(apphost.Config{ID: "my3d", Name: "My 3D", Version: version, Listen: "127.0.0.1:9018"}, webui.Files(), func(h *apphost.Host) (apphost.Application, error) { return app.New(h) }); e != nil {

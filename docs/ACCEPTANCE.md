@@ -16,3 +16,11 @@ Unavailable operations are disabled with tooltips or described in Help. Parametr
 Automated acceptance uses an isolated NTFS account store, a real Windows executable and headless Edge. It checks all primitive solids, analytical cut volume (within 0.005 mm³), an exported STL's closed edges and through-hole rays, STEP/3MF contents, dimension regeneration, UI hole subtraction, undo/redo, reload persistence, numeric align, logical grouping, sketch extrusion and A1 mini warnings. Desktop 1672 × 941, tablet 768 × 1024 and phone 390 × 844 screenshots are visually reviewed. A 3MF is validated as an OPC package; an actual slicer roundtrip must be separately recorded before claiming it.
 
 Run `npm ci && npm run build` under `web`, `go test ./...` with `MY3D_TEST_ROOT` and `GOTMPDIR` set to an isolated NTFS folder, and `node scripts/acceptance.mjs` under `web` with `MY3D_QA_EXE` pointing to the built executable. The native acceptance port is 39118; do not use production account stores. Publication receipts identify exactly which checks ran against the final binary.
+
+The loading regression check is `node scripts/loading-acceptance.mjs`, with
+`MY3D_QA_EXE`, `MY3D_QA_OUTPUT` and an isolated `MY3D_QA_DATA` directory set.
+It runs a native fixture on port 39119 and holds the real CAD worker request:
+desktop and phone show a spinner and loading message before geometry arrives,
+with selection controls hidden. It also checks the updating indicator over an
+existing model, blank projects, cancellation and a subsequent successful load.
+Screenshots verify that feedback stays inside the visible phone workplane.

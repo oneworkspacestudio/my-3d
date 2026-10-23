@@ -13,7 +13,7 @@ export const Section=(p:P)=>{const ctx=useContext(Fields);return ctx.widgets[p.i
 export const Heading=(p:P)=>h(`h${p.level||2}`,{},p.children);
 export const Text=(p:P)=>h('span',{className:cls('text',p)},p.children);
 export const Image=(p:P)=>h('img',{src:p.src,alt:p.alt,width:p.width,height:p.height});
-export const Icon=(p:P)=>h((Lucide as any)[p.name]||Lucide.Box,{size:p.size||23,strokeWidth:1.7,'aria-hidden':true});
+export const Icon=(p:P)=>h((Lucide as any)[p.name]||Lucide.Box,{size:p.size||23,strokeWidth:1.7,className:p.className,'aria-hidden':true});
 export const Spacer=()=>h('span',{className:'spacer'});
 export const Divider=()=>h('span',{className:'divider'});
 export const Button=(p:P)=>{const c=useContext(Fields);return h('button',{type:'button',className:cls('button',p),'aria-label':p.label||p.title,title:p.title||p.label,disabled:!!p.disabled,'data-action':p.item,draggable:p.draggable,onDragStart:(e:any)=>{e.dataTransfer.setData('application/my3d-shape',p.item);e.dataTransfer.effectAllowed='copy'},onClick:()=>{c.item.current=p.item;p.onClick?.()}},p.shape?h('span',{className:`shape-preview shape-${p.shape}`,'aria-hidden':true},p.shape==='text'?'A':p.shape==='star'?'★':p.shape==='heart'?'♥':p.shape==='polygon'?'⬢':null):p.icon?h(Icon,{name:p.icon}):null,p.label?h('span',{},p.label):p.children)};
