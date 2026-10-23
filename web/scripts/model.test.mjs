@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {part,template,validate,bounds} from '../src/model.ts';
+test('rotated bounding boxes support geometric alignment',()=>{const p=part('box',[10,-5,2]);p.size=[80,50,20];p.rot=[0,0,90];const b=bounds([p]);assert.ok(Math.abs(b.size[0]-50)<1e-9);assert.ok(Math.abs(b.size[1]-80)<1e-9);assert.equal(b.size[2],20);assert.equal(b.min[2],2)});
+test('project validation rejects nonfinite coordinates and excessive source trees',()=>{const p=template('empty'),b=part('box');p.objects=[b];validate(p);b.pos[0]=NaN;assert.throws(()=>validate(p));b.pos[0]=0;b.size[2]=-1;assert.throws(()=>validate(p));b.size[2]=20;p.objects=Array.from({length:201},()=>part('box'));assert.throws(()=>validate(p))});
+test('starters retain editable primitives and a real subtractive hole',()=>{for(const type of ['phone','hole','nameplate'])validate(template(type));const p=template('hole');assert.equal(p.objects.length,2);assert.equal(p.objects[1].hole,true);assert.ok(p.objects[1].pos[2]<0);assert.ok(p.objects[1].size[2]>p.objects[0].size[2])});
