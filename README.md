@@ -11,3 +11,5 @@ My 3D runs inside One Workspace or as a standalone Windows application. Its brow
 [Windows releases](https://github.com/oneworkspacestudio/my-3d/releases) · [Getting started](docs/SETUP.md) · [Capabilities and limits](docs/ACCEPTANCE.md) · [Engine and source audit](docs/ENGINE.md)
 
 This is a new application, **not a TweakCAD fork**. The repository linked by TweakCAD's official website was unavailable during the audit. My 3D uses Replicad and OpenCascade instead. This first preview implements shape modelling and dimensioned profile extrusion; it does not include a general sketch constraint solver or every feature in the master brief. The capability matrix lists the remaining work.
+
+![My 3D desktop editor](docs/screenshots/desktop.png)
