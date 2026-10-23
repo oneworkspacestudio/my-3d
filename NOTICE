@@ -1,0 +1,6 @@
+My 3D
+Copyright 2026 One Workspace contributors.
+Original application and SVG logo. This is not a fork of TweakCAD.
+Uses Replicad, OpenCascade Technology / opencascade.js, Three.js, React,
+Lucide, fflate, opentype.js, Abel and One Workspace apphost.
+See THIRD-PARTY-LICENSES.txt, docs/ENGINE.md and the release source archives.

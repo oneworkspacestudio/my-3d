@@ -1,0 +1,51 @@
+Page Editor
+  Row variant=header
+    Image src="./logo.svg" alt="My 3D" width=40 height=40
+    Heading level=1 "My 3D"
+    Divider
+    Button action=projects variant=breadcrumb "My Projects"
+    Icon name=ChevronRight size=16
+    Button action=rename variant=project "$name"
+    Text variant=saved "$saved"
+    Spacer
+    Button action=help icon=CircleHelp label="Help" variant=icon
+    Button action=notifications icon=Bell label="Activity" variant=icon
+    Button action=account variant=avatar "$initials"
+  Row variant=toolbar
+    For each=$tools
+      Button action=$item.id item=$item.id icon=$item.icon label=$item.label disabled=$item.disabled title=$item.title variant=$item.variant
+  Row variant=workspace
+    Section id=viewport
+    Stack variant=sidebar
+      Card variant=library
+        Row variant=tabs
+          For each=$tabs
+            Button action=$item.id item=$item.id icon=$item.icon label=$item.label variant=$item.variant title=$item.title disabled=$item.disabled
+        Input name=search placeholder="Search shapes…" variant=search
+        Row variant=library-heading
+          Heading level=2 "$libraryTitle"
+          Spacer
+          Select name=category options=$categories
+        Grid variant=shapes
+          For each=$shapes
+            Button action=$item.action item=$item.kind variant=shape label=$item.name shape=$item.kind title=$item.title draggable=true
+      Card variant=inspector
+        Row variant=tabs
+          Button action=properties icon=SlidersHorizontal label="Properties" variant=$propertiesVariant
+          Button action=appearance icon=Palette label="Appearance" variant=$appearanceVariant
+          Button action=advanced icon=Settings label="Advanced" variant=$advancedVariant
+        Section id=inspector
+  Row variant=statusbar
+    Text "$status"
+    Spacer
+    Text "Millimetres · OpenCascade"
+    Button action=toggle-panel icon=PanelRight label="Tools" variant=compact
+  If condition=$message
+    Alert "$message"
+  If condition=$modal
+    Card variant=modal
+      Row
+        Heading level=2 "$modalTitle"
+        Spacer
+        Button action=close icon=X label="Close" variant=icon
+      Section id=modal

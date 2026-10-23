@@ -1,0 +1,4 @@
+let worker:Worker;let seq=0;const waiting=new Map<number,any>();
+export function resetKernel(){worker?.terminate();for(const p of waiting.values()){clearTimeout(p.timer);p.reject(Error('CAD operation cancelled; your editable project is retained.'))}waiting.clear();worker=undefined}
+export function kernel(op:string,data:any={}):Promise<any>{if(!worker){worker=new Worker(new URL('./kernel.worker.ts',import.meta.url),{type:'module'});worker.onmessage=e=>{const p=waiting.get(e.data.id);if(!p)return;clearTimeout(p.timer);waiting.delete(e.data.id);e.data.error?p.reject(Error(e.data.error)):p.resolve(e.data.result)};worker.onerror=e=>{for(const p of waiting.values())p.reject(Error(e.message||'CAD worker stopped'));resetKernel()}}
+ return new Promise((resolve,reject)=>{const id=++seq;const timer=setTimeout(()=>resetKernel(),60000);waiting.set(id,{resolve,reject,timer});worker.postMessage({id,op,...data})})}

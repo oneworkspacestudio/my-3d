@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "checks": [
+    "Native embedded WASM renders editable phone stand",
+    "All 12 primitives produce CAD solids; dimension changes regenerate exact extrusion",
+    "Exported STL is manifold and ray-tested through-hole; STEP and 3MF are real geometry",
+    "Inspector precision and persistence after reload",
+    "UI box/hole subtraction and undo/redo",
+    "Align centres three solids using CAD bounds",
+    "Logical group moves and restores editable children",
+    "Sketch extrusion and A1 mini 180 mm guard",
+    "390 px phone and 768 px tablet layouts, touch-sized shape controls"
+  ],
+  "errors": [],
+  "cadVolume": 74910.61828427829,
+  "manifold": true,
+  "primitiveResults": [
+    {
+      "kind": "box",
+      "volume": 7999.999999999998,
+      "triangles": 12
+    },
+    {
+      "kind": "rounded",
+      "volume": 7931.327412287183,
+      "triangles": 444
+    },
+    {
+      "kind": "cylinder",
+      "volume": 6283.185307179586,
+      "triangles": 460
+    },
+    {
+      "kind": "sphere",
+      "volume": 4188.790204786392,
+      "triangles": 5620
+    },
+    {
+      "kind": "cone",
+      "volume": 2096.4915918903107,
+      "triangles": 2172
+    },
+    {
+      "kind": "tube",
+      "volume": 3709.5926053588264,
+      "triangles": 920
+    },
+    {
+      "kind": "polygon",
+      "volume": 5196.152422706631,
+      "triangles": 20
+    },
+    {
+      "kind": "star",
+      "volume": 2703.8121605453766,
+      "triangles": 36
+    },
+    {
+      "kind": "heart",
+      "volume": 5076.6925402812085,
+      "triangles": 524
+    },
+    {
+      "kind": "wedge",
+      "volume": 4000,
+      "triangles": 8
+    },
+    {
+      "kind": "frame",
+      "volume": 4700.000000000001,
+      "triangles": 24
+    },
+    {
+      "kind": "text",
+      "volume": 3309.0299765268956,
+      "triangles": 2188
+    }
+  ],
+  "sketchVolumes": [
+    9999.999999999998,
+    15000
+  ],
+  "cleanHost": false,
+  "physicalPrinter": false
+}

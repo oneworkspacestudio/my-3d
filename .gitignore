@@ -1,0 +1,10 @@
+web/node_modules/
+internal/webui/dist/*
+!internal/webui/dist/.gitkeep
+*.exe
+*.zip
+*.syso
+web/src/generated/
+test-results/
+
+!cmd/my-3d/rsrc_windows_amd64.syso

@@ -1,0 +1,31 @@
+name: Windows checks
+on: [workflow_dispatch]
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.2'
+      - run: New-Item -ItemType Directory C:/my3d-tests -Force
+        shell: pwsh
+      - run: go test ./...
+        env:
+          MY3D_TEST_ROOT: C:/my3d-tests
+          GOTMPDIR: C:/my3d-tests
+      - run: go vet ./...
+      - run: ./scripts/build.ps1
+        shell: pwsh
+      - run: node scripts/acceptance.mjs
+        working-directory: web
+        env:
+          MY3D_QA_EXE: ${{ github.workspace }}/dist/My3D.exe
+          MY3D_QA_OUTPUT: ${{ github.workspace }}/dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: My3D-Windows
+          path: dist/
