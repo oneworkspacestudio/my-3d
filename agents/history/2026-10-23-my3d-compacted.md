@@ -33,3 +33,19 @@ suite72-or-next available version retaining public71 app contracts/bytes, isolat
 OIDC/Drive/proxy validation, backed-up owner update selecting only Workspace/My3D,
 deployed byte/health checks and fixture cleanup. No clean-host/reboot/physical-
 printer/signed-artifact/GitHub Actions claim.
+
+## Publication and integration verified
+
+Public preview1 source d9263861783306232fbd17d8d0908cf8bf2d12f4; all9 assets
+match local SHA256/size and a real public binary download. Workspace72 source
+3b13a29/public with all147 bundled payloads verified and prior25 app contracts/bytes
+retained. Exact native9 checks and real managed6 checks pass, including same-user
+Drive roundtrip in a second browser and exported3MF rendered in My Slicer.
+Actual phone/tablet visual review and touch input pass.
+
+Owner deployment follows an independently running recovery; it restored owner67,
+then our normal Workspace+My3D update acquired the lock and is creating/verifying
+its backup. Do not claim installed until tooling owner-installation.json and
+health/static-byte checks pass. Owner data was never an identity/Drive fixture.
+Suite main combines My3D and independently committed remote-admin work, while
+release72 stays at tested3b13a29. Published tags/assets are immutable.
