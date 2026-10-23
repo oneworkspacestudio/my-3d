@@ -49,3 +49,30 @@ its backup. Do not claim installed until tooling owner-installation.json and
 health/static-byte checks pass. Owner data was never an identity/Drive fixture.
 Suite main combines My3D and independently committed remote-admin work, while
 release72 stays at tested3b13a29. Published tags/assets are immutable.
+
+## Delivery complete (supersedes pending deployment notes)
+
+Normal protected owner67-to72 update completed. All25 previous application
+contracts and primary package bytes, identity, paths, ports, preferences, existing
+OIDC clients and recovery credentials retained. My3D preview1 added;26 app contracts
+and25 local/public services all running. Both manager copies and My3D executable
+match release digests. Served native frontend, CAD worker and app logo bytes match
+the tested assets; public content-addressed suite icon matches its SVG source.
+Latest normal recovery backup manifest hash verified. Ordinary files were covered
+by the normal verified backup. No owner identity/Drive functional test was used.
+
+Open https://workspace.m8e.co.uk/my3d/. Source/publication/integration/deployment
+evidence is docs/evidence/my3d-20261023.json in the suite. Tool receipts include
+owner-installation.json and deployment-verification.json. Installer72 remains
+357be412e91f5684cc1d2bcae5930aa1dbe646a2b941b84e6fe5ca5d654b3602.
+Downloads contains the verified My3D ZIP and full Workspace72 installer after
+backup completion. All synthetic services, fixture helpers and observers stopped.
+
+The normal updater removed one obsolete automatic backup after verification and
+kept the newest usable recovery. It retained some unfamiliar older files needing
+cleanup review; do not delete those or recovery-only data as test artifacts.
+Mail's existing external incoming-connectivity warning remains outside CAD scope;
+all process health checks pass. No physical printing, clean-host, reboot or signed
+artifact claim. General sketch constraints/arcs and several formats remain
+unavailable as explicitly documented; this is a functional preview, not full
+master-brief completion. Published tags/assets remain immutable.
