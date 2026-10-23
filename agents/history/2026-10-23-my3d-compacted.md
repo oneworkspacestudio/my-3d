@@ -97,3 +97,24 @@ that manager and every other app. Its idle maintenance window currently reports
 an unauthenticated GitHub release-check403; do not overwrite that active runtime
 or use owner identity/Drive as a fixture. Resume with packaging/publication and a
 normal verified backup/update for My3D only, then deployed static-byte verification.
+
+Preview2 is now public at immutable source04a761f; all10 release asset digests and
+sizes verified, plus a real public executable download. Exe SHA256:
+4e0d02b2dc3b81d4622ed6eeb2d68f6f7c434d2544e8b2c7f0818a8f942f00e9.
+workspace-update.json validates all11 app-owned package members for independent
+managed updates. Exact released executable passes the loading acceptance above.
+Evidence: docs/evidence/loading-preview2.json. A separate concurrent Workspace73
+transaction completed during this fix; we waited without interrupting it.
+
+Installation is pending: normal backup/rollback space guard needs about9.35GB
+free on C:, currently about6GB. Requested that user free at least3.5GB or supply
+another local NTFS backup folder. Do not bypass the guard or remove owner/recovery
+backups. Our synthetic loading stores are tiny; other chats own their own caches.
+Artifacts/scripts: I:/Projects/tooling/my-3d-loading-20261023. install.py checks
+space and complete journal before invoking ApplyLoadingFix.exe built from exact
+public73 source. It uses authenticated normal CheckUpdates/ApplyUpdates, verifies
+the tested preview2 digest and My3D-only selection, and removes GitHub credential
+environment variables before preflight launches any runtime process. No credential
+is recorded in receipts. If user supplies another backup folder, adapt helper's
+UpdateRequest.BackupRoot and space check first. Once installed, verify all service
+health, served frontend hashes and installation.json invariants; update evidence.

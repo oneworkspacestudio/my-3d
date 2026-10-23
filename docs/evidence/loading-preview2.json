@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "release": "https://github.com/oneworkspacestudio/my-3d/releases/tag/v0.1.0-preview.2",
+  "sourceCommit": "04a761f2e98c6e92454b56b09140b01497de894f",
+  "exeSHA256": "4e0d02b2dc3b81d4622ed6eeb2d68f6f7c434d2544e8b2c7f0818a8f942f00e9",
+  "allTenReleaseAssetsVerified": true,
+  "publicExecutableDownloadVerified": true,
+  "managedPayloadsVerified": 11,
+  "verification": [
+    "frontend typecheck and production build",
+    "three model unit tests",
+    "exact release binary in isolated native Edge sessions",
+    "delayed real CAD worker loading at 1672x941 and 390x844",
+    "spinner, loading message and selection controls gated on geometry",
+    "card placement inside visible mobile canvas and no horizontal overflow",
+    "compact updating status over existing geometry",
+    "blank project, cancellation and subsequent successful loading",
+    "no browser page errors"
+  ],
+  "installed": false,
+  "installationStatus": "Pending normal backup free-space check; installed Workspace73 and My3D preview1 retained."
+}
