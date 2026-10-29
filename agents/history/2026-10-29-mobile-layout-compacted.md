@@ -23,3 +23,29 @@ Release target preview3, using app-only workspace-update.json. Normal protected
 update must verify selected executable hash, retain owner config/credentials and
 all other app contracts/package bytes, then check deployed frontend bytes.
 No second-PC installation or reboot/mobile hardware test is implied.
+
+## Publication and primary deployment
+
+Immutable preview3 source e6d997801f5a5a381dd39b00febc09ac3096a0ce, executable
+SHA256 40eb60332af884670ba1055dce77b1ac8f4a810222491737521286c4162138a3.
+All ten release assets match local sizes/SHA256; anonymous checksum download and
+public update-channel preview3 entry verified. Release:
+https://github.com/oneworkspacestudio/my-3d/releases/tag/v0.1.0-preview.3
+
+A concurrent Workspace101 deployment/cleanup held the update lock. We waited,
+then used the normal app-only ApplyUpdates path with the 101-compatible updater
+(update/distribution code unchanged from100). My3D preview1-to3 recovery backup
+verified 56MB, reusing38.3MB and copying17.8MB. Primary now serves preview3 and
+its exact tested JS/CSS/worker/WASM/index bytes. Manager and other apps excluded
+from selection. Final helper receipt follows recovery cleanup; do not interrupt
+that normal cleanup. Tools/receipts: I:/Projects/tooling/my-3d-mobile-20261029.
+
+Screenshot target workspace-2 has not been updated: CUA inventory still reports
+local browser use disabled in Work settings. No alternative route was used to
+bypass that setting. Native phone hardware/reboot acceptance is not claimed.
+
+Completion supersedes the pending-cleanup note: the normal update returned
+success, all apps healthy, latest verified recovery retained. Receipt confirms
+Workspace101 and all other app contracts/packages, owner settings, identity and
+credentials retained; exact tested preview3 installed. See
+`docs/evidence/mobile-installation.json` and the synthetic mobile previews.

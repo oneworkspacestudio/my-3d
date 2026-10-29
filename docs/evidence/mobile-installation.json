@@ -1,0 +1,11 @@
+{
+  "exactTestedBinaryInstalled": true,
+  "identityAndCredentialsRetained": true,
+  "my3dSHA256": "40eb60332af884670ba1055dce77b1ac8f4a810222491737521286c4162138a3",
+  "my3dVersion": "0.1.0-preview.3",
+  "normalBackedUpUpdate": true,
+  "otherAppContractsAndPackagesRetained": true,
+  "ownerConfigurationRetained": true,
+  "schema": 1,
+  "workspaceVersion": "0.3.0-preview.101"
+}
