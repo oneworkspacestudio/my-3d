@@ -1,0 +1,35 @@
+{
+  "checks": [
+    {
+      "width": 390,
+      "height": 700,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 360,
+      "height": 640,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 650,
+      "height": 844,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "isolated": true
+}

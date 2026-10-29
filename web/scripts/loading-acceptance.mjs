@@ -28,9 +28,9 @@ try{
       await page.screenshot({path:out+'/'+name+'-loading.png'});
       if(name==='cancel'){
         await status.getByRole('button',{name:'Cancel',exact:true}).click();await expect(status).toHaveCount(0);await expect(workplane).toHaveAttribute('aria-busy','false');await expect(page.locator('.object-context')).toHaveCount(0);
-        release();await page.getByRole('button',{name:'Box',exact:true}).tap();
+        release();await page.getByRole('button',{name:'Add',exact:true}).tap();await page.getByRole('button',{name:'Box',exact:true}).tap();
       }else release();
-      await expect(page.locator('.dimension')).toHaveCount(3,{timeout:60000});await expect(status).toHaveCount(0);await expect(page.locator('.object-context')).toBeVisible();await expect(workplane).toHaveAttribute('aria-busy','false');
+      await expect(page.locator('.dimension')).toHaveCount(3,{timeout:60000});await expect(status).toHaveCount(0);await expect(page.locator('.object-context'))[name==='desktop'?'toBeVisible':'toBeHidden']();await expect(workplane).toHaveAttribute('aria-busy','false');
       await page.screenshot({path:out+'/'+name+'-ready.png'});
       if(name==='desktop'){
         await page.getByRole('button',{name:'Box',exact:true}).click();await expect(status).toHaveCount(0,{timeout:60000});
@@ -43,7 +43,7 @@ try{
         await expect(status).toHaveCount(0,{timeout:60000});await expect(page.locator('.dimension')).toHaveCount(0);await expect(page.locator('.object-context')).toHaveCount(0);
         await page.getByRole('button',{name:'Box',exact:true}).click();await expect(page.locator('.dimension')).toHaveCount(3,{timeout:60000});await expect(status).toHaveCount(0);
       }
-      expect(errors).toEqual([]);checks.push({name,loadingVisible:true,controlsHiddenWhileLoading:true,cardInsideCanvas:true,readyControlsVisible:true,cancelAndRestart:name==='cancel',errors});
+      expect(errors).toEqual([]);checks.push({name,loadingVisible:true,controlsHiddenWhileLoading:true,cardInsideCanvas:true,readyControlsVisible:name==='desktop',cancelAndRestart:name==='cancel',errors});
     }finally{release();await context.close()}
   }
   await writeFile(out+'/loading-acceptance.json',JSON.stringify({schema:1,checks,isolated:true},null,2));console.log('Loading, responsive placement, blank scene and cancel/restart checks passed');

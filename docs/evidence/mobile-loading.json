@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "checks": [
+    {
+      "name": "desktop",
+      "loadingVisible": true,
+      "controlsHiddenWhileLoading": true,
+      "cardInsideCanvas": true,
+      "readyControlsVisible": true,
+      "cancelAndRestart": false,
+      "errors": []
+    },
+    {
+      "name": "phone",
+      "loadingVisible": true,
+      "controlsHiddenWhileLoading": true,
+      "cardInsideCanvas": true,
+      "readyControlsVisible": false,
+      "cancelAndRestart": false,
+      "errors": []
+    },
+    {
+      "name": "cancel",
+      "loadingVisible": true,
+      "controlsHiddenWhileLoading": true,
+      "cardInsideCanvas": true,
+      "readyControlsVisible": false,
+      "cancelAndRestart": true,
+      "errors": []
+    }
+  ],
+  "isolated": true
+}

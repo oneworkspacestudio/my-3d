@@ -14,9 +14,23 @@ Page Editor
   Row variant=toolbar
     For each=$tools
       Button action=$item.id item=$item.id icon=$item.icon label=$item.label disabled=$item.disabled title=$item.title variant=$item.variant
+  Row variant=mobile-toolbar
+    For each=$primaryTools
+      Button action=$item.id item=$item.id icon=$item.icon label=$item.label disabled=$item.disabled variant=$item.variant
   Row variant=workspace
     Section id=viewport
-    Stack variant=sidebar
+    Stack variant=$sidebarVariant
+      Row variant=mobile-sheet-header
+        Heading level=2 $sheetTitle
+        Spacer
+        Button action=close-panel icon=X label="Close panel" variant=icon
+      Card variant=mobile-tools
+        Grid variant=mobile-actions
+          For each=$selectionTools
+            Button action=$item.id item=$item.id icon=$item.icon label=$item.label disabled=$item.disabled variant=tool
+          For each=$secondaryTools
+            Button action=$item.id item=$item.id icon=$item.icon label=$item.label disabled=$item.disabled variant=tool
+          Button action=multi icon=MousePointer2 label=$multiLabel variant=tool
       Card variant=library
         Row variant=tabs
           For each=$tabs
@@ -35,6 +49,11 @@ Page Editor
           Button action=appearance icon=Palette label="Appearance" variant=$appearanceVariant
           Button action=advanced icon=Settings label="Advanced" variant=$advancedVariant
         Section id=inspector
+  Row variant=mobile-dock
+    Button action=open-library icon=Plus label="Add" variant=$addVariant
+    Button action=open-inspector icon=SlidersHorizontal label="Edit" variant=$editVariant
+    Button action=open-tools icon=Ellipsis label="Actions" variant=$actionsVariant
+    Button action=projects icon=FolderOpen label="Projects" variant=tool
   Row variant=statusbar
     Text "$status"
     Spacer
