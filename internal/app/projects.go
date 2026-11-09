@@ -14,6 +14,7 @@ import (
 	"regexp"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 type App struct {
@@ -105,9 +106,24 @@ func validateScene(raw []byte) error {
 		Schema  int
 		Units   string
 		Objects []json.RawMessage
+		Notes   []struct {
+			ID   string
+			Pos  []float64
+			Text string
+		}
 	}
-	if json.Unmarshal(raw, &s) != nil || s.Schema != 1 || s.Units != "mm" || len(s.Objects) > 200 {
+	if json.Unmarshal(raw, &s) != nil || s.Schema != 1 || s.Units != "mm" || len(s.Objects) > 200 || len(s.Notes) > 100 {
 		return errors.New("Invalid My 3D version 1 project")
+	}
+	for _, note := range s.Notes {
+		if !safeID.MatchString(note.ID) || len(note.Pos) != 3 || utf8.RuneCountInString(note.Text) > 500 {
+			return errors.New("Invalid design note")
+		}
+		for _, v := range note.Pos {
+			if math.IsNaN(v) || math.IsInf(v, 0) || math.Abs(v) > 10000 {
+				return errors.New("Invalid design note position")
+			}
+		}
 	}
 	count := 0
 	var visit func(json.RawMessage, int) error
