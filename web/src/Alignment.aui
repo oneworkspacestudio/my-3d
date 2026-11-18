@@ -1,0 +1,20 @@
+Card Alignment variant=alignment
+  Row
+    Heading level=2 $title
+    Spacer
+    Button action=close-align icon=X label="Close alignment" variant=icon
+  Text variant=alignment-help "Choose an edge or centre. Click a selected shape to keep it fixed."
+  Select name=alignmentReference label="Alignment reference" options=$references
+  If condition=$waiting
+    Text variant=alignment-status $status
+  For each=$axes
+    Row variant=alignment-axis
+      Text $item.label
+      For each=$item.anchors
+        Button action=item.id item=$item.action preview=$item.preview label=$item.label disabled=$item.disabled title=$item.title variant=$item.variant
+  If condition=$canDistribute
+    Row variant=alignment-distribute
+      Text "Space centres"
+      For each=$distribute
+        Button action=item.id item=$item.action preview=$item.preview label=$item.label disabled=$item.disabled title=$item.title variant=compact
+  Button action=close-align label=Done variant=compact

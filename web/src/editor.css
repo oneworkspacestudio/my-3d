@@ -35,3 +35,27 @@
 .workplane-marker{position:absolute;z-index:2;max-width:180px;max-height:72px;overflow:hidden;text-overflow:ellipsis;padding:5px 8px;border:1px solid #e9c777;border-radius:7px;background:#fff7d4;color:#513b10;text-align:left}
 .workplane-marker[hidden]{display:none}
 @media(max-width:650px) and (pointer:coarse){.mobile-select{display:block;top:auto;bottom:12px;left:12px;min-height:44px;z-index:4}.mobile-select--active{background:#e7edff;border-color:#5271f7}}
+
+.card--alignment{position:absolute;right:16px;bottom:44px;z-index:6;width:300px;max-width:calc(100% - 24px);padding:12px;display:grid;gap:8px;max-height:calc(100% - 24px);overflow:auto}
+.card--alignment h2{font-size:15px}
+.card--alignment .button--icon{width:32px;height:32px;min-height:32px}
+.text--alignment-help,.text--alignment-status{font-size:12px;line-height:1.4;color:#637799}
+.card--alignment select{width:100%;min-height:40px}
+.row--alignment-axis{display:grid;grid-template-columns:20px repeat(3,1fr);gap:5px}
+.row--alignment-axis .button{min-width:0;min-height:36px;padding:5px;font-size:12px}
+.row--alignment-distribute{gap:4px;font-size:12px}
+.row--alignment-distribute>.text{flex:1}
+.alignment-dot-container{position:absolute;inset:0;pointer-events:none;z-index:5}
+.button--alignment-dot{position:absolute;width:28px;height:28px;min-height:28px;padding:0;border:none;border-radius:50%;transform:translate(-50%,-50%);pointer-events:auto;background:transparent}
+.button--alignment-dot>span{font-size:0}
+.button--alignment-dot:before{content:'';display:block;width:12px;height:12px;border-radius:50%;background:#1b2446;box-shadow:0 0 0 2px white}
+.button--alignment-dot:hover:before,.button--alignment-dot:focus-visible:before{background:#f0a32a}
+.button--alignment-dot:disabled{opacity:.6;cursor:default}
+.button--alignment-dot:disabled:before{background:#a3acbf}
+.button--alignment-dot[hidden]{display:none}
+@media(max-width:650px){
+ .card--alignment{right:12px;bottom:12px;width:280px;max-height:48%;gap:5px;padding:10px}
+ .card--alignment .row--alignment-axis .button{min-height:44px}
+ .card--alignment .text--alignment-help{font-size:11px}
+ .button--alignment-dot{width:44px;height:44px;min-height:44px}
+}

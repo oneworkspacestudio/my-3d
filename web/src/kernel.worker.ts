@@ -2,7 +2,8 @@ import init from 'replicad-opencascadejs';
 import wasmURL from 'replicad-opencascadejs/wasm?url';
 import * as cad from 'replicad';
 import {zipSync,strToU8} from 'fflate';
-import {Part,validate} from './model';
+import {Euler,Quaternion,Vector3,Box3} from 'three';
+import {Part,V3,validate} from './model';
 let ready:Promise<any>,shapes=new Map<string,any>();
 async function boot(){const oc=await init({locateFile:()=>wasmURL});cad.setOC(oc);const font=await fetch(new URL('./Abel-Regular.ttf',import.meta.url));await cad.loadFont(await font.arrayBuffer());}
 function drawing(o:Part){const [w,d]=o.size;if(o.profile==='circle')return cad.drawCircle(w/2);if(o.profile==='polyline'&&o.points?.length>=3){let p=cad.draw(o.points[0] as any);for(const q of o.points.slice(1))p=p.lineTo(q as any);return p.close()}return cad.drawRectangle(w,d)}
@@ -37,7 +38,64 @@ function build(o:Part):any{const [w,d,z]=o.size;let s:any;
 function payload(o:Part,s:any){const mesh=s.mesh({tolerance:.12,angularTolerance:.12});return{id:o.id,...mesh,bounds:s.boundingBox.bounds,solids:s.solids.length,volume:cad.measureVolume(s)}}
 function combined(){const solids=[...shapes.values()];if(!solids.length)throw Error('There are no visible solids to export');let s=solids[0].clone();for(const v of solids.slice(1))s=s.fuse(v);return s}
 function threeMF(s:any){const m=s.mesh({tolerance:.05,angularTolerance:.08});let vs='',ts='';for(let i=0;i<m.vertices.length;i+=3)vs+=`<vertex x="${m.vertices[i]}" y="${m.vertices[i+1]}" z="${m.vertices[i+2]}"/>`;for(let i=0;i<m.triangles.length;i+=3)ts+=`<triangle v1="${m.triangles[i]}" v2="${m.triangles[i+1]}" v3="${m.triangles[i+2]}"/>`;return new Blob([zipSync({'[Content_Types].xml':strToU8('<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>'),'_rels/.rels':strToU8('<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>'),'3D/3dmodel.model':strToU8(`<?xml version="1.0"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><object id="1" type="model"><mesh><vertices>${vs}</vertices><triangles>${ts}</triangles></mesh></object></resources><build><item objectid="1"/></build></model>`)} ) as any],{type:'application/vnd.ms-package.3dmanufacturing-3dmodel+xml'})}
-self.onmessage=async e=>{const {id,op,project,format,file,object}=e.data;try{await(ready??=boot());if(op==='render'){validate(project);for(const s of shapes.values())s.delete();shapes.clear();const results=[];for(const o of project.objects.filter((v:Part)=>v.visible)){if(o.kind==='mesh'){results.push({id:o.id,...o.mesh,imported:true});continue}const s=build(o);results.push(payload(o,s));if(!o.hole)shapes.set(o.id,s);else s.delete()}postMessage({id,result:results})}
+function meshPayload(o:Part) {
+ const rotation = new Euler(...o.rot.map(n => n * Math.PI / 180) as V3, 'ZYX');
+ const position = new Vector3(...o.pos);
+ const source = o.mesh;
+ const vertices:number[] = [], normals:number[] = [];
+ const bounds = new Box3();
+ const v = new Vector3();
+ for (let i = 0; i < source.vertices.length; i += 3) {
+  v.fromArray(source.vertices, i).applyEuler(rotation).add(position);
+  vertices.push(v.x, v.y, v.z);
+  bounds.expandByPoint(v);
+ }
+ for (let i = 0; i < (source.normals?.length ?? 0); i += 3) {
+  v.fromArray(source.normals, i).applyEuler(rotation);
+  normals.push(v.x, v.y, v.z);
+ }
+ return {id:o.id,vertices,normals,triangles:source.triangles,bounds:[bounds.min.toArray(),bounds.max.toArray()],imported:true};
+}
+
+function frameBounds(s:any, frame?:{origin:V3;rotation:V3}) {
+ if (!frame) return s.boundingBox.bounds;
+ let projected = s.clone().translate(frame.origin.map(n => -n));
+ for (const axis of [2,1,0]) {
+  const angle = frame.rotation[axis];
+  if (angle) projected = projected.rotate(-angle,[0,0,0],axis===0?[1,0,0]:axis===1?[0,1,0]:[0,0,1]);
+ }
+ try { return projected.boundingBox.bounds; } finally { projected.delete(); }
+}
+
+self.onmessage=async e=>{
+ const {id,op,project,format,file,object,alignmentFrame}=e.data;
+ try{
+  await(ready??=boot());
+  if(op==='render'){
+   validate(project);
+   for(const s of shapes.values())s.delete();
+   shapes.clear();
+   const results=[];
+   for(const o of project.objects.filter((v:Part)=>v.visible)){
+    if(o.kind==='mesh'){
+     const mesh=meshPayload(o),bounds=new Box3(),v=new Vector3();
+     const rotation=alignmentFrame?new Euler(...alignmentFrame.rotation.map(n=>n*Math.PI/180) as V3,'ZYX'):null;
+     const inverse=rotation?new Quaternion().setFromEuler(rotation).invert():null;
+     const origin=new Vector3(...(alignmentFrame?.origin??[0,0,0]));
+     for(let i=0;i<mesh.vertices.length;i+=3){
+      v.fromArray(mesh.vertices,i);
+      if(inverse)v.sub(origin).applyQuaternion(inverse);
+      bounds.expandByPoint(v);
+     }
+     results.push({...mesh,alignmentBounds:[bounds.min.toArray(),bounds.max.toArray()]});
+     continue;
+    }
+    const s=build(o);
+    results.push({...payload(o,s),alignmentBounds:frameBounds(s,alignmentFrame)});
+    if(!o.hole)shapes.set(o.id,s);else s.delete();
+   }
+   postMessage({id,result:results});
+  }
  if(op==='checkShape'){const s=build(object);s.delete();postMessage({id,result:true})}
  if(op==='export'){const s=combined();try{const result=format==='step'?s.blobSTEP():format==='3mf'?threeMF(s):s.blobSTL({binary:true,tolerance:.05});postMessage({id,result})}finally{s.delete()}}
  if(op==='import'){if(file.size>16*1024*1024)throw Error('File exceeds 16 MiB');const s=await cad.importSTEP(file);const serialized=s.serialize();postMessage({id,result:{mesh:payload({id:'import'} as any,s),brep:serialized}});s.delete()}

@@ -1,0 +1,3 @@
+Row AlignmentHandles variant=alignment-handles
+  For each=$handles
+    Button action=item.id item=$item.action preview=$item.preview label=$item.label disabled=$item.disabled title=$item.title variant=$item.variant axis=$item.axis anchor=$item.anchor

@@ -24,3 +24,25 @@ desktop and phone show a spinner and loading message before geometry arrives,
 with selection controls hidden. It also checks the updating indicator over an
 existing model, blank projects, cancellation and a subsequent successful load.
 Screenshots verify that feedback stays inside the visible phone workplane.
+
+## Alignment
+
+Select two or more visible shapes and use Align or L. Nine canvas dots and
+the panel controls align minimum edges, bounding-box centres or maximum edges
+on X, Y and Z. Hover or keyboard focus previews the move in amber. Click a
+selected shape, or choose it in Alignment reference, to keep that shape fixed.
+Choose Use selection bounds to return to the combined bounds. Grey controls
+need no move. Locked shapes stay fixed, and holes remain part of the selection.
+
+The current workplane defines the alignment axes. Rotated primitives, editable
+groups, imported STEP solids and triangle models use their actual geometry.
+Alignment waits for an edit to finish rebuilding. Each applied move is one
+undo step. Done, Escape or an empty-space click dismisses the tool. Touch uses
+the same labelled panel and the existing multi-select control.
+
+Run `node scripts/alignment-acceptance.mjs` under web with MY3D_QA_EXE set to
+the built native executable. It uses a synthetic NTFS store on port 39125.
+Alignment unit tests run with npm test. Native acceptance covers all nine
+directions, hover preview without mutation, fixed reference selection,
+undo/redo, holes, rotated groups, STL-style triangle data, STEP bounds,
+custom workplanes, current-geometry gating and emulated phone controls.

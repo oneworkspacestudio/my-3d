@@ -2,10 +2,11 @@ import React,{useEffect,useRef,useState} from 'react';
 import * as T from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {TransformControls} from 'three/examples/jsm/controls/TransformControls.js';
+import {View as AlignmentHandles} from './generated/AlignmentHandles';
 import {Icon} from './components/ui';
 import {Part,V3} from './model';
 const h=React.createElement;
-export function Viewport(p:any){const [views,setViews]=useState(false);const el=useRef<HTMLDivElement>(null),world=useRef<any>(null),latest=useRef(p);latest.current=p;const dims=useRef<any[]>([]),markers=useRef<{el:HTMLElement;position:T.Vector3}[]>([]);
+export function Viewport(p:any){const [views,setViews]=useState(false);const el=useRef<HTMLDivElement>(null),world=useRef<any>(null),latest=useRef(p);latest.current=p;const alignmentDots=useRef<HTMLDivElement>(null);const dims=useRef<any[]>([]),markers=useRef<{el:HTMLElement;position:T.Vector3}[]>([]);
  useEffect(()=>{const dom=el.current!;const scene=new T.Scene();scene.background=new T.Color('#f3f9ff');scene.fog=new T.Fog('#f3f9ff',260,720);const camera=new T.PerspectiveCamera(40,1,.1,2000);camera.up.set(0,0,1);camera.position.set(145,-210,175);const renderer=new T.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;dom.prepend(renderer.domElement);const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,0,40);controls.minDistance=1;controls.maxDistance=650;controls.mouseButtons={LEFT:null,MIDDLE:T.MOUSE.PAN,RIGHT:T.MOUSE.ROTATE};controls.zoomToCursor=true;controls.touches={ONE:T.TOUCH.ROTATE,TWO:T.TOUCH.DOLLY_PAN};const ambient=new T.HemisphereLight('#f4fbff','#8ba7ce',1.8);ambient.position.set(0,0,1);scene.add(ambient);const sun=new T.DirectionalLight('#ffffff',2.6);sun.position.set(-85,-60,180);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-160;sun.shadow.camera.right=160;sun.shadow.camera.top=160;sun.shadow.camera.bottom=-160;sun.shadow.bias=-.0001;sun.shadow.normalBias=.3;scene.add(sun);const fill=new T.DirectionalLight('#b3ddff',1.0);fill.position.set(80,60,80);scene.add(fill);
  const floor=new T.Mesh(new T.PlaneGeometry(420,420),new T.MeshStandardMaterial({color:'#f4fcff',roughness:.9,metalness:0}));floor.position.z=-.2;floor.receiveShadow=true;scene.add(floor);const grid=new T.GridHelper(420,84,'#9eddf7','#c7eafa');grid.rotation.x=Math.PI/2;grid.position.z=.02;grid.material.transparent=true;grid.material.opacity=.65;scene.add(grid);const fine=new T.GridHelper(420,420,'#cbeeff','#dcf3ff');fine.rotation.x=Math.PI/2;fine.position.z=.01;fine.material.transparent=true;fine.material.opacity=.45;scene.add(fine);const border=new T.LineSegments(new T.EdgesGeometry(floor.geometry),new T.LineBasicMaterial({color:'#98ddf6'}));border.position.z=.03;scene.add(border);
  const group=new T.Group(),selected=new T.Group();scene.add(group,selected);
@@ -105,14 +106,14 @@ export function Viewport(p:any){const [views,setViews]=useState(false);const el=
   controls.mouseButtons.LEFT=orbit?T.MOUSE.PAN:null;
   controls.mouseButtons.MIDDLE=e.shiftKey||orbit?T.MOUSE.ROTATE:T.MOUSE.PAN;
   const left=e.button===0&&!orbit;
-  transform.enabled=left&&!latest.current.helper;
+  transform.enabled=left&&!latest.current.helper&&!latest.current.aligning;
   if(!touch)canvas.focus({preventScroll:true});
   if(!left)return;
   modifiers={shift:e.shiftKey,alt:e.altKey};copyHandle=e.altKey;
   transform.setRotationSnap(e.shiftKey?Math.PI/4:latest.current.snap?Math.PI/12:null);
   const hit=pick(e),surface=hit?new T.Plane().setFromNormalAndCoplanarPoint(workSurface().normal,hit.point):undefined;
   const part=latest.current.objects.find((o:Part)=>o.id===hit?.object.userData.id);
-  const movable=part&&!part.locked&&part.kind!=='mesh'&&!latest.current.helper;
+  const movable=part&&!part.locked&&part.kind!=='mesh'&&!latest.current.helper&&!latest.current.aligning;
   controls.enableRotate=!touch||(!hit&&!latest.current.multi&&!latest.current.helper);
   gesture={id:e.pointerId,x:e.clientX,y:e.clientY,touch,shift:e.shiftKey,alt:e.altKey,dragged:false,hit,
    ids:hit?(latest.current.selected.includes(part?.id)?[...latest.current.selected]:[hit.object.userData.id]):[],
@@ -156,11 +157,17 @@ export function Viewport(p:any){const [views,setViews]=useState(false);const el=
  const onUp=(e:PointerEvent)=>{
   if(e.pointerId===handlePointer)handlePointer=null;
   if(e.pointerType==='touch')touches.delete(e.pointerId);
-  if(!touches.size){controls.enableRotate=true;transform.enabled=!latest.current.helper}
+  if(!touches.size){controls.enableRotate=true;transform.enabled=!latest.current.helper&&!latest.current.aligning}
   const g=gesture;
   if(!g||g.id!==e.pointerId)return;
   endGesture();
   if(!g.dragged){
+   if(latest.current.aligning){
+    const id=g.hit?.object.userData.id;
+    if(id&&latest.current.selected.includes(id)){latest.current.chooseAlignmentReference(id);return}
+    latest.current.action('close-align');
+    if(!id)return;
+   }
    if(latest.current.helper){
     const hit=g.hit,normal=hit?.face?.normal.clone().applyNormalMatrix(new T.Matrix3().getNormalMatrix(hit.object.matrixWorld)).toArray();
     const pt=latest.current.helper==='ruler'?ground(e):hit?.point.toArray()??ground(e);
@@ -188,7 +195,7 @@ export function Viewport(p:any){const [views,setViews]=useState(false);const el=
   if(gesture?.id===e.pointerId)endGesture();
   if(handlePointer===e.pointerId)cancelHandle();
   touches.delete(e.pointerId);
-  if(!touches.size){controls.enableRotate=true;transform.enabled=!latest.current.helper}
+  if(!touches.size){controls.enableRotate=true;transform.enabled=!latest.current.helper&&!latest.current.aligning}
  };
  const swallowContextMenu=(e:Event)=>e.preventDefault();
  canvas.tabIndex=-1;
@@ -201,7 +208,25 @@ export function Viewport(p:any){const [views,setViews]=useState(false);const el=
  canvas.addEventListener('lostpointercapture',onCancel);
  const over=(e:any)=>{if(e.dataTransfer.types.includes('application/my3d-shape')){e.preventDefault();latest.current.setDropping(true);const pos=ground(e);preview.position.set(...pos).addScaledVector(workSurface().normal,10);preview.visible=true}};const drop=(e:any)=>{e.preventDefault();const kind=e.dataTransfer.getData('application/my3d-shape');if(kind)latest.current.add(kind,ground(e));latest.current.setDropping(false);preview.visible=false};const leave=()=>{latest.current.setDropping(false);preview.visible=false};const preview=new T.Mesh(new T.BoxGeometry(20,20,20),new T.MeshStandardMaterial({color:'#447fff',transparent:true,opacity:.3,depthWrite:false}));preview.visible=false;scene.add(preview);
  dom.addEventListener('dragover',over);dom.addEventListener('drop',drop);dom.addEventListener('dragleave',leave);
- const resize=()=>{const w=dom.clientWidth,height=dom.clientHeight,viewHeight=height;renderer.setSize(w,viewHeight,false);dom.style.setProperty('--workplane-height',viewHeight+'px');camera.fov=w<650?36:32;camera.aspect=w/viewHeight;camera.clearViewOffset();camera.updateProjectionMatrix()};const ro=new ResizeObserver(resize);ro.observe(dom);resize();let frame=0;const animate=()=>{frame=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera);for(const list of [dims.current,markers.current])for(const d of list){const v=d.position.clone().project(camera);d.el.style.left=(v.x+1)*dom.clientWidth/2+'px';d.el.style.top=(-v.y+1)*canvas.clientHeight/2+'px';d.el.hidden=v.z< -1||v.z>1}};animate();
+ const resize=()=>{const w=dom.clientWidth,height=dom.clientHeight,viewHeight=height;renderer.setSize(w,viewHeight,false);dom.style.setProperty('--workplane-height',viewHeight+'px');camera.fov=w<650?36:32;camera.aspect=w/viewHeight;camera.clearViewOffset();camera.updateProjectionMatrix()};const ro=new ResizeObserver(resize);ro.observe(dom);resize();let frame=0;const animate=()=>{frame=requestAnimationFrame(animate);controls.update();updateAlignmentDots();renderer.render(scene,camera);for(const list of [dims.current,markers.current])for(const d of list){const v=d.position.clone().project(camera);d.el.style.left=(v.x+1)*dom.clientWidth/2+'px';d.el.style.top=(-v.y+1)*canvas.clientHeight/2+'px';d.el.hidden=v.z< -1||v.z>1}};
+ const updateAlignmentDots=()=>{
+  const dots=alignmentDots.current;
+  const extent=latest.current.alignmentExtent;
+  if(!dots||!extent)return;
+  const [min,max]=extent;
+  const frame=latest.current.alignmentFrame;
+  const rotation=new T.Quaternion().setFromEuler(new T.Euler(...(frame?.rotation??[0,0,0]).map(T.MathUtils.degToRad) as V3,'ZYX'));
+  const padding=Math.max(5,Math.min(12,new T.Vector3(...max).distanceTo(new T.Vector3(...min))*.08));
+  for(const button of Array.from(dots.querySelectorAll<HTMLButtonElement>('button'))){
+   const axis=Number(button.dataset.axis),anchor=Number(button.dataset.anchor);
+   const position=new T.Vector3(min[0]-padding,min[1]-padding,min[2]);
+   position.setComponent(axis,anchor===0?min[axis]:anchor===2?max[axis]:(min[axis]+max[axis])/2);
+   const projected=position.applyQuaternion(rotation).add(new T.Vector3(...(frame?.origin??[0,0,0]))).project(camera);
+   button.hidden=projected.z< -1||projected.z>1;
+   button.style.left=(projected.x+1)*dom.clientWidth/2+'px';
+   button.style.top=(1-projected.y)*canvas.clientHeight/2+'px';
+  }
+ };
  const fit=(selectionOnly=true)=>{
   const b=new T.Box3().setFromObject(selected);
   if(!selectionOnly||b.isEmpty())b.union(new T.Box3().setFromObject(group));
@@ -230,12 +255,38 @@ export function Viewport(p:any){const [views,setViews]=useState(false);const el=
   }
   latest.current.dropShapes(offsets);
  };
+ animate();
  latest.current.viewCommands.current={fit,zoom,drop:dropToPlane};
  world.current={scene,camera,renderer,controls,group,selected,transform,resize,fit,zoom,home:()=>{camera.position.set(145,-210,175);controls.target.set(0,0,40);controls.update()},view:(v:string)=>{const target=controls.target.clone();camera.position.copy(target.add(v==='top'?new T.Vector3(0,-.01,220):v==='right'?new T.Vector3(220,0,40):new T.Vector3(0,-220,45)));controls.update()}};
  return()=>{latest.current.viewCommands.current=null;marquee.remove();canvas.removeEventListener('contextmenu',swallowContextMenu);canvas.removeEventListener('pointerdown',onBeforeDown,true);canvas.removeEventListener('pointerdown',onDown);canvas.removeEventListener('pointermove',onMove,true);canvas.removeEventListener('pointerup',onUp);canvas.removeEventListener('pointercancel',onCancel);canvas.removeEventListener('lostpointercapture',onCancel);cancelAnimationFrame(frame);ro.disconnect();transform.dispose();controls.dispose();scene.traverse((o:any)=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach((m:any)=>m.dispose());else o.material?.dispose()});renderer.dispose();renderer.domElement.remove();dom.removeEventListener('dragover',over);dom.removeEventListener('drop',drop);dom.removeEventListener('dragleave',leave);world.current=null};},[]);
  useEffect(()=>{const w=world.current;if(!w)return;w.transform.detach();for(const group of [w.group,w.selected]){for(const c of [...group.children]){group.remove(c);c.traverse((o:any)=>{o.geometry?.dispose();o.material?.dispose()})}}w.selected.position.set(0,0,0);w.selected.rotation.set(0,0,0);w.selected.scale.set(1,1,1);dims.current.forEach(v=>v.el.remove());dims.current=[];const box=new T.Box3();for(const data of p.meshes){const o=p.objects.find((v:Part)=>v.id===data.id&&v.visible);if(!o)continue;const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(data.vertices,3));if(data.triangles)g.setIndex(data.triangles);if(data.normals?.length)g.setAttribute('normal',new T.Float32BufferAttribute(data.normals,3));else g.computeVertexNormals();const material=new T.MeshPhysicalMaterial({color:o.hole?'#a0acc2':o.color,roughness:.33,metalness:.05,clearcoat:.23,clearcoatRoughness:.45,transparent:o.hole,opacity:o.hole?.38:1,side:T.DoubleSide});const mesh=new T.Mesh(g,material);mesh.userData.id=o.id;mesh.castShadow=!o.hole;mesh.receiveShadow=true;w.group.add(mesh);if(o.hole){const edges=new T.LineSegments(new T.WireframeGeometry(g),new T.LineBasicMaterial({color:'#7d8ca9',transparent:true,opacity:.16}));mesh.add(edges)}if(p.selected.includes(o.id)){box.expandByObject(mesh);const outline=new T.LineSegments(new T.EdgesGeometry(g,35),new T.LineBasicMaterial({color:'#3264eb',transparent:true,opacity:.65}));mesh.add(outline)}}
- if(!box.isEmpty()){const center=box.getCenter(new T.Vector3());w.selected.position.copy(center);w.selected.updateMatrixWorld(true);for(const mesh of [...w.group.children])if(p.selected.includes(mesh.userData.id))w.selected.attach(mesh);if(['move','rotate','scale'].includes(p.mode)&&!p.objects.some((o:Part)=>p.selected.includes(o.id)&&o.locked)){w.transform.setMode(p.mode==='move'?'translate':p.mode);w.transform.setTranslationSnap(p.snap?1:null);w.transform.setRotationSnap(p.snap?Math.PI/12:null);w.transform.setScaleSnap(p.snap?.05:null);w.transform.attach(w.selected)}const size=box.getSize(new T.Vector3());const labels=[{value:size.x,pos:new T.Vector3(center.x,box.min.y-9,0)},{value:size.y,pos:new T.Vector3(box.max.x+11,center.y,0)},{value:size.z,pos:new T.Vector3(box.min.x-12,center.y,center.z)}];for(const d of labels){const label=document.createElement('span');label.className='dimension';label.textContent=Number(d.value.toFixed(1))+' mm';el.current!.append(label);dims.current.push({el:label,position:d.pos})}}
- },[p.meshes,p.objects,p.selected,p.mode,p.snap]);
+ if(!box.isEmpty()){const center=box.getCenter(new T.Vector3());w.selected.position.copy(center);w.selected.updateMatrixWorld(true);for(const mesh of [...w.group.children])if(p.selected.includes(mesh.userData.id))w.selected.attach(mesh);if(['move','rotate','scale'].includes(p.mode)&&!p.objects.some((o:Part)=>p.selected.includes(o.id)&&o.locked)){w.transform.setMode(p.mode==='move'?'translate':p.mode);w.transform.setTranslationSnap(p.snap?1:null);w.transform.setRotationSnap(p.snap?Math.PI/12:null);w.transform.setScaleSnap(p.snap?.05:null);if(!p.aligning)w.transform.attach(w.selected)}const size=box.getSize(new T.Vector3());const labels=[{value:size.x,pos:new T.Vector3(center.x,box.min.y-9,0)},{value:size.y,pos:new T.Vector3(box.max.x+11,center.y,0)},{value:size.z,pos:new T.Vector3(box.min.x-12,center.y,center.z)}];for(const d of labels){const label=document.createElement('span');label.className='dimension';label.textContent=Number(d.value.toFixed(1))+' mm';el.current!.append(label);dims.current.push({el:label,position:d.pos})}}
+ },[p.meshes,p.objects,p.selected,p.mode,p.snap,p.aligning]);
+ useEffect(()=>{
+  const w=world.current;if(!w||!p.aligning)return;
+  const ghosts:T.Mesh[]=[];
+  for(const mesh of [...w.group.children,...w.selected.children]){
+   if(mesh.userData.id===p.alignmentReference){
+    const outline=new T.LineSegments(new T.EdgesGeometry(mesh.geometry,35),new T.LineBasicMaterial({color:'#e89921'}));
+    outline.name='alignment-reference';mesh.add(outline);
+   }
+   const delta=p.alignmentPreview[mesh.userData.id];
+   if(!delta)continue;
+   const ghost=new T.Mesh(mesh.geometry,new T.MeshBasicMaterial({color:'#f4a52c',transparent:true,opacity:.38,depthWrite:false,side:T.DoubleSide}));
+   mesh.updateWorldMatrix(true,false);
+   ghost.applyMatrix4(mesh.matrixWorld);
+   ghost.position.add(new T.Vector3(...delta));
+   ghost.userData.alignmentPreview=true;
+   w.scene.add(ghost);ghosts.push(ghost);
+  }
+  return()=>{
+   ghosts.forEach(ghost=>{ghost.removeFromParent();(ghost.material as T.Material).dispose()});
+   for(const mesh of [...w.group.children,...w.selected.children]){
+    const outline=mesh.getObjectByName('alignment-reference');
+    if(outline){outline.removeFromParent();outline.geometry.dispose();outline.material.dispose()}
+   }
+  };
+ },[p.aligning,p.alignmentPreview,p.alignmentReference,p.meshes,p.selected]);
  useEffect(()=>{
   const w=world.current;if(!w)return;
   const guides:T.GridHelper[]=[];
@@ -272,7 +323,9 @@ export function Viewport(p:any){const [views,setViews]=useState(false);const el=
  },[p.notes,p.ruler]);
  useEffect(()=>world.current?.resize(),[p.panel]);
  useEffect(()=>{const w=world.current;if(!w)return;world.current.scene.getObjectByName('buildVolume')?.removeFromParent();if(!p.volume)return;const g=new T.EdgesGeometry(new T.BoxGeometry(p.volume,p.volume,p.volume));const lines=new T.LineSegments(g,new T.LineBasicMaterial({color:'#16b9ab',transparent:true,opacity:.45}));lines.name='buildVolume';lines.position.z=p.volume/2;w.scene.add(lines)},[p.volume]);
+ const alignmentOverlay=p.aligning?h('div',{ref:alignmentDots,className:'alignment-dot-container'},
+  h(AlignmentHandles,{data:{handles:p.alignmentHandles},onAction:p.action})):null;
  const hasGeometry=p.meshes.some((m:any)=>p.objects.some((o:Part)=>o.id===m.id&&o.visible)),hasSelection=p.meshes.some((m:any)=>p.selected.includes(m.id)&&p.objects.some((o:Part)=>o.id===m.id&&o.visible));
  const tool=(label:string,icon:string,fn:any)=>h('button',{key:label,className:'round-tool',title:label,'aria-label':label,onClick:fn},h(Icon,{name:icon}));
- return h('div',{ref:el,className:'viewport'+(views?' viewport--views':''),'aria-label':'Interactive 3D workplane','aria-busy':Boolean(p.busy)},h('button',{className:'mobile-view-toggle','aria-label':'View controls','aria-expanded':views,onClick:()=>setViews(v=>!v)},h(Icon,{name:views?'X':'Orbit'})),h('div',{className:'viewcube'},h('div',{className:'cube-body'},...['top','front','right'].map(v=>h('button',{key:v,className:'cube-'+v,onClick:()=>world.current?.view(v),'aria-label':v+' view'},v.toUpperCase())))),h('div',{className:'canvas-tools'},tool('Home view','House',()=>world.current?.home()),tool('Fit model','Focus',()=>world.current?.fit()),tool('Zoom in','Plus',()=>world.current?.zoom(.8)),tool('Zoom out','Minus',()=>world.current?.zoom(1.25)),tool('Model properties','Box',()=>p.action('properties'))),h('div',{className:'axis-helper'},h('svg',{viewBox:'0 0 110 98'},h('defs',{},h('marker',{id:'arrowx',markerWidth:5,markerHeight:5,refX:3,refY:2,orient:'auto'},h('path',{d:'M0,0 L4,2 L0,4',fill:'#f45954'}))),h('path',{d:'M18 69L70 92',stroke:'#f45954',strokeWidth:3,markerEnd:'url(#arrowx)'}),h('path',{d:'M18 69L57 45',stroke:'#24bb4c',strokeWidth:3}),h('path',{d:'M18 69L18 15',stroke:'#1498ed',strokeWidth:3}),h('text',{x:77,y:97,fill:'#ef483e'},'X'),h('text',{x:60,y:44,fill:'#22b84e'},'Y'),h('text',{x:12,y:10,fill:'#2448ff'},'Z'))),h('div',{className:'canvas-hint'},'Right-drag to orbit · Middle-drag to pan · Scroll to zoom'),!p.busy&&hasSelection?h('div',{className:'object-context'},...['duplicate','delete','hole','color','hide','lock'].map((a,i)=>h('button',{key:a,title:a,'aria-label':a+' selected',onClick:()=>p.action(a)},h(Icon,{name:['Copy','Trash2','Circle','Palette','EyeOff','LockKeyhole'][i]})))):null,p.busy?h('div',{className:'loading-surface'+(hasGeometry?' loading-surface--updating':'')},h('div',{className:'loading-overlay',role:'status','aria-live':'polite','aria-atomic':true},h(Icon,{name:'LoaderCircle',className:'model-spinner','aria-hidden':true}),h('div',{className:'loading-copy'},h('strong',{},hasGeometry&&p.busy==='Loading your model…'?'Updating your model…':p.busy),!hasGeometry?h('span',{},'Your 3D geometry will appear here.'):null),h('button',{onClick:p.cancel,title:'Cancel CAD computation',className:'button--compact'},'Cancel'))):null,p.dropping?h('div',{className:'drop-hint'},'Drop onto the workplane · 1 mm snap'):null,p.children);
+ return h('div',{ref:el,className:'viewport'+(views?' viewport--views':''),'aria-label':'Interactive 3D workplane','aria-busy':Boolean(p.busy)},h('button',{className:'mobile-view-toggle','aria-label':'View controls','aria-expanded':views,onClick:()=>setViews(v=>!v)},h(Icon,{name:views?'X':'Orbit'})),h('div',{className:'viewcube'},h('div',{className:'cube-body'},...['top','front','right'].map(v=>h('button',{key:v,className:'cube-'+v,onClick:()=>world.current?.view(v),'aria-label':v+' view'},v.toUpperCase())))),h('div',{className:'canvas-tools'},tool('Home view','House',()=>world.current?.home()),tool('Fit model','Focus',()=>world.current?.fit()),tool('Zoom in','Plus',()=>world.current?.zoom(.8)),tool('Zoom out','Minus',()=>world.current?.zoom(1.25)),tool('Model properties','Box',()=>p.action('properties'))),h('div',{className:'axis-helper'},h('svg',{viewBox:'0 0 110 98'},h('defs',{},h('marker',{id:'arrowx',markerWidth:5,markerHeight:5,refX:3,refY:2,orient:'auto'},h('path',{d:'M0,0 L4,2 L0,4',fill:'#f45954'}))),h('path',{d:'M18 69L70 92',stroke:'#f45954',strokeWidth:3,markerEnd:'url(#arrowx)'}),h('path',{d:'M18 69L57 45',stroke:'#24bb4c',strokeWidth:3}),h('path',{d:'M18 69L18 15',stroke:'#1498ed',strokeWidth:3}),h('text',{x:77,y:97,fill:'#ef483e'},'X'),h('text',{x:60,y:44,fill:'#22b84e'},'Y'),h('text',{x:12,y:10,fill:'#2448ff'},'Z'))),h('div',{className:'canvas-hint'},'Right-drag to orbit · Middle-drag to pan · Scroll to zoom'),alignmentOverlay,!p.aligning&&!p.busy&&hasSelection?h('div',{className:'object-context'},...['duplicate','delete','hole','color','hide','lock'].map((a,i)=>h('button',{key:a,title:a,'aria-label':a+' selected',onClick:()=>p.action(a)},h(Icon,{name:['Copy','Trash2','Circle','Palette','EyeOff','LockKeyhole'][i]})))):null,p.busy?h('div',{className:'loading-surface'+(hasGeometry?' loading-surface--updating':'')},h('div',{className:'loading-overlay',role:'status','aria-live':'polite','aria-atomic':true},h(Icon,{name:'LoaderCircle',className:'model-spinner','aria-hidden':true}),h('div',{className:'loading-copy'},h('strong',{},hasGeometry&&p.busy==='Loading your model…'?'Updating your model…':p.busy),!hasGeometry?h('span',{},'Your 3D geometry will appear here.'):null),h('button',{onClick:p.cancel,title:'Cancel CAD computation',className:'button--compact'},'Cancel'))):null,p.dropping?h('div',{className:'drop-hint'},'Drop onto the workplane · 1 mm snap'):null,p.children);
 }
