@@ -54,3 +54,31 @@ I:/Projects/tooling/my-3d-alignment-20261118. The two disposable NTFS roots
 were removed after verifying their services had stopped. GitHub Actions
 remain disabled. This change is available in the public updater; installation
 is pending a request for this change.
+
+## Primary installation complete
+
+User requested installation on 2026-11-18. Actual primary was Workspace128 /
+My3D4, with a complete recovery journal. Its old controller required the
+verified Workspace141 installer before independent app updates were offered.
+
+The full repair path stopped at its normal 10306 MB free-space guard before
+replacing programs. The verified public141 installer was then run through its
+supported selected-update CLI, with only workspace,my3d selected. That path
+downloaded four assets and passed its normal recovery capacity check.
+
+Normal backed-up installation completed: My3D5 on Workspace141. The helper
+verified retained owner configuration/identity/decrypted credentials, unchanged
+other app contracts and primary app package metadata. The recovery copy checked
+2009.2 MB, reusing1556.3 MB and copying452.9 MB. Its manifest hash verifies.
+The updater kept the latest recovery and retained other files needing cleanup
+attention. No recovery data was queried through SQLite or used as a fixture.
+
+The installed executable matches the tested preview5 digest. Local health and
+all eight served frontend assets match a separate synthetic instance of the
+exact release binary. All46 startup steps completed, with Mail's incoming
+Internet email warning and no failed app step. Physical reboot is untested.
+
+Detailed sanitized receipts: installation.json, deployment.json and
+delivery.json under I:/Projects/tooling/my-3d-alignment-20261118. The synthetic
+verification process stopped and the task's disposable NTFS root was removed.
+Public source tags and release assets remained immutable.
