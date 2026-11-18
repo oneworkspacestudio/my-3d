@@ -33,3 +33,24 @@ Seven frontend/model tests pass. Go tests and vet pass after creating their
 required synthetic test root. No owner data was opened as a fixture.
 
 Preview.5 keeps the existing app route, storage, identity and project schema.
+
+## Published and promoted
+
+Preview.5 is public from b434f2c514c7dcad21acce16430746b1b4852a13.
+All ten immutable asset sizes and GitHub digests match local release files,
+and an anonymous executable download matches the exact tested binary.
+Executable SHA256 e6ad193fd1c4f356a598e4f92620fdb07609d5be110a86e0922517b5c9751629.
+Release https://github.com/oneworkspacestudio/my-3d/releases/tag/v0.1.0-preview.5.
+
+Workspace channel842f793 promotes preview.5 and the verified legacy component
+pin using the supported publisher filter/encoder. Anonymous native updater
+checks passed against public Workspace141, public122 and a synthetic older
+four-package My 3D layout. Each selected only My 3D and staged/verified the
+public package hashes. Existing desktop/touch controls and all five viewport
+layout checks also passed against the exact preview.5 executable.
+
+Artifacts and sanitized delivery.json remain under
+I:/Projects/tooling/my-3d-alignment-20261118. The two disposable NTFS roots
+were removed after verifying their services had stopped. GitHub Actions
+remain disabled. This change is available in the public updater; installation
+is pending a request for this change.
